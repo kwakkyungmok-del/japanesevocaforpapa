@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>일본어 단어장</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700;900&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #faf7ef;
+    --bg-line: #efe9d8;
+    --card: #dceec8;
+    --card-dark: #c6e2ac;
+    --ink: #26331f;
+    --ink-soft: #5c6b52;
+    --deep: #3f6b32;
+    --deep-dark: #2c4d23;
+    --plum: #b5527a;
+    --plum-soft: #f3dde6;
+    --brass: #c9a227;
+    --paper: #fffdf6;
+    --shadow: rgba(63, 107, 50, 0.18);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      repeating-linear-gradient(0deg, transparent, transparent 34px, var(--bg-line) 34px, var(--bg-line) 35px),
+      var(--bg);
+    font-family:'Noto Sans KR', sans-serif;
+    color:var(--ink);
+    min-height:100vh;
+    padding-bottom:80px;
+  }
+  .jp{ font-family:'Zen Maru Gothic', 'Noto Sans KR', sans-serif; }
+
+  /* ---------- HEADER ---------- */
+  header{
+    max-width:880px;
+    margin:0 auto;
+    padding:34px 24px 18px;
+  }
+  .ring-row{
+    display:flex;
+    gap:10px;
+    margin-bottom:14px;
+  }
+  .ring-row span{
+    width:14px;height:14px;border-radius:50%;
+    background: var(--paper);
+    border:3px solid var(--brass);
+    box-shadow: inset 0 0 0 3px var(--bg);
+  }
+  h1{
+    font-family:'Zen Maru Gothic', sans-serif;
+    font-size:clamp(28px,5vw,40px);
+    font-weight:900;
+    margin:0 0 6px;
+    color:var(--deep-dark);
+    letter-spacing:-0.01em;
+  }
+  h1 small{
+    display:block;
+    font-family:'Noto Sans KR', sans-serif;
+    font-size:14px;
+    font-weight:500;
+    color:var(--ink-soft);
+    margin-top:6px;
+  }
+  .stats-bar{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-top:20px;
+  }
+  .stat-chip{
+    background:var(--paper);
+    border:1px solid var(--bg-line);
+    border-radius:14px;
+    padding:10px 16px;
+    display:flex;
+    flex-direction:column;
+    min-width:88px;
+    box-shadow:0 2px 0 var(--bg-line);
+  }
+  .stat-chip .n{ font-size:22px; font-weight:900; color:var(--deep); font-family:'Zen Maru Gothic',sans-serif;}
+  .stat-chip .l{ font-size:11px; color:var(--ink-soft); margin-top:2px;}
+
+  /* ---------- NAV TABS ---------- */
+  nav{
+    max-width:880px;
+    margin:0 auto;
+    padding:0 24px;
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    position:sticky;
+    top:0;
+    background:linear-gradient(var(--bg) 80%, transparent);
+    padding-top:14px;
+    padding-bottom:14px;
+    z-index:20;
+  }
+  .tab{
+    font-family:'Noto Sans KR',sans-serif;
+    font-weight:700;
+    font-size:14px;
+    padding:9px 16px;
+    border-radius:999px;
+    background:var(--paper);
+    border:1.5px solid var(--bg-line);
+    color:var(--ink-soft);
+    cursor:pointer;
+    transition:.15s;
+    white-space:nowrap;
+  }
+  .tab:hover{ border-color:var(--deep); color:var(--deep);}
+  .tab.active{ background:var(--deep); border-color:var(--deep); color:#fff; box-shadow:0 3px 0 var(--deep-dark);}
+
+  main{ max-width:880px; margin:0 auto; padding:10px 24px 40px; }
+
+  .day-select{
+    display:flex; gap:6px; flex-wrap:wrap; margin-bottom:20px;
+  }
+  .day-pill{
+    font-size:12px; font-weight:700; padding:6px 12px; border-radius:8px;
+    background:var(--paper); border:1px solid var(--bg-line); color:var(--ink-soft); cursor:pointer;
+  }
+  .day-pill.active{ background:var(--brass); border-color:var(--brass); color:#fff;}
+
+  /* ---------- FLASHCARD GRID ---------- */
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(150px,1fr));
+    gap:16px;
+  }
+  .flip-card{
+    perspective:1000px;
+    height:150px;
+    cursor:pointer;
+  }
+  .flip-inner{
+    position:relative; width:100%; height:100%;
+    transition:transform .5s cubic-bezier(.4,.2,.2,1);
+    transform-style:preserve-3d;
+  }
+  .flip-card.flipped .flip-inner{ transform:rotateY(180deg); }
+  .face{
+    position:absolute; inset:0;
+    border-radius:18px;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    backface-visibility:hidden;
+    padding:10px;
+    text-align:center;
+    box-shadow:0 4px 0 var(--shadow);
+  }
+  .face.front{ background:var(--card); }
+  .face.front.mastered{ background: #cdeaa8; box-shadow:0 4px 0 var(--brass); }
+  .face.front.review{ background: var(--plum-soft); box-shadow:0 4px 0 var(--plum); }
+  .face.front .kana{ font-family:'Zen Maru Gothic',sans-serif; font-size:30px; font-weight:700; color:var(--deep-dark); line-height:1.15;}
+  .face.back{
+    background:var(--deep);
+    color:#fff;
+    transform:rotateY(180deg);
+    gap:4px;
+  }
+  .face.back .romaji{ font-size:12px; letter-spacing:.06em; opacity:.8; text-transform:uppercase; font-weight:500;}
+  .face.back .meaning{ font-size:16px; font-weight:700; margin-top:2px;}
+  .mark-row{
+    position:absolute; bottom:8px; display:flex; gap:6px;
+  }
+  .mark-btn{
+    font-size:10px; font-weight:700; padding:4px 8px; border-radius:8px; border:none; cursor:pointer;
+  }
+  .mark-btn.know{ background:var(--brass); color:#fff; }
+  .mark-btn.dontknow{ background:var(--plum); color:#fff; }
+
+  /* badge for mastered ring */
+  .badge{
+    position:absolute; top:8px; right:8px; font-size:14px;
+  }
+
+  /* ---------- PHRASE LIST ---------- */
+  .phrase-set-title{
+    font-size:13px; font-weight:700; color:var(--ink-soft); margin:22px 0 10px; padding-left:2px;
+  }
+  .phrase-card{
+    background:var(--paper); border:1px solid var(--bg-line); border-radius:16px;
+    padding:16px 18px; margin-bottom:10px; cursor:pointer;
+    box-shadow:0 2px 0 var(--bg-line);
+  }
+  .phrase-jp{ font-family:'Zen Maru Gothic',sans-serif; font-size:18px; font-weight:700; color:var(--deep-dark);}
+  .phrase-kr{ font-size:14px; color:var(--ink-soft); margin-top:6px; display:none;}
+  .phrase-card.shown .phrase-kr{ display:block; }
+  .phrase-card.shown{ background:#fff9ec; }
+
+  /* ---------- QUIZ ---------- */
+  .quiz-wrap{
+    background:var(--paper);
+    border-radius:24px;
+    padding:36px 24px;
+    text-align:center;
+    border:1px solid var(--bg-line);
+    box-shadow:0 4px 0 var(--bg-line);
+  }
+  .quiz-progress{ font-size:12px; color:var(--ink-soft); font-weight:700; margin-bottom:18px;}
+  .quiz-word{
+    font-family:'Zen Maru Gothic',sans-serif;
+    font-size:44px; font-weight:900; color:var(--deep-dark);
+    margin-bottom:8px;
+  }
+  .quiz-romaji{ font-size:13px; color:var(--ink-soft); letter-spacing:.06em; text-transform:uppercase; margin-bottom:28px;}
+  .quiz-options{ display:grid; grid-template-columns:1fr 1fr; gap:12px; max-width:480px; margin:0 auto;}
+  .opt-btn{
+    font-family:'Noto Sans KR',sans-serif;
+    font-size:15px; font-weight:700; padding:16px 10px;
+    background:var(--card); border:none; border-radius:14px; cursor:pointer;
+    color:var(--deep-dark);
+    box-shadow:0 3px 0 var(--card-dark);
+    transition:.1s;
+  }
+  .opt-btn:active{ transform:translateY(2px); box-shadow:0 1px 0 var(--card-dark);}
+  .opt-btn.correct{ background:var(--deep); color:#fff; box-shadow:0 3px 0 var(--deep-dark);}
+  .opt-btn.wrong{ background:var(--plum); color:#fff; box-shadow:0 3px 0 #8a3a5a;}
+  .opt-btn:disabled{ cursor:default; }
+  .quiz-score{
+    margin-top:26px; font-size:13px; color:var(--ink-soft); font-weight:700;
+  }
+  .quiz-next{
+    margin-top:20px; display:none;
+    background:var(--deep); color:#fff; border:none; font-weight:700;
+    padding:12px 28px; border-radius:999px; cursor:pointer; font-family:'Noto Sans KR',sans-serif;
+    box-shadow:0 3px 0 var(--deep-dark);
+  }
+  .empty-state{ text-align:center; padding:60px 20px; color:var(--ink-soft); }
+  .empty-state .em{ font-size:40px; margin-bottom:12px;}
+
+  footer{
+    max-width:880px; margin:0 auto; padding:20px 24px; text-align:center;
+    font-size:11px; color:var(--ink-soft);
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .flip-inner{ transition:none; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="ring-row">
+    <span></span><span></span><span></span><span></span><span></span>
+  </div>
+  <h1>일본어 단어장
+    <small>사진 속 단어카드를 눌러서 발음과 뜻을 확인하세요. 매일 새 단어가 추가됩니다.</small>
+  </h1>
+  <div class="stats-bar" id="statsBar"></div>
+</header>
+
+<nav>
+  <div class="tab active" data-mode="cards">🗂 카드학습</div>
+  <div class="tab" data-mode="phrase">💬 핵심구문</div>
+  <div class="tab" data-mode="quiz">✏️ 자가테스트</div>
+  <div class="tab" data-mode="review">🔁 복습</div>
+</nav>
+
+<main id="main"></main>
+
+<footer>매일 새 이미지가 오면 단어 목록에 추가돼요 · 학습 기록은 이 기기에 자동 저장됩니다</footer>
+
+<script>
+/* =========================================================
+   단어 데이터베이스 — 매일 새 이미지가 오면 이 배열에 추가
+   ========================================================= */
+const WORDS = [
+  {kana:"さん", romaji:"san", meaning:"~씨, ~님 (이름 뒤에 붙이는 존칭)", day:1},
+  {kana:"くつ", romaji:"kutsu", meaning:"신발, 구두", day:1},
+  {kana:"ともだち", romaji:"tomodachi", meaning:"친구", day:1},
+  {kana:"どこ", romaji:"doko", meaning:"어디", day:1},
+  {kana:"しろい", romaji:"shiroi", meaning:"하얀, 흰색의", day:1},
+
+  {kana:"コンビニ", romaji:"konbini", meaning:"편의점", day:2},
+  {kana:"ピザ", romaji:"piza", meaning:"피자", day:2},
+  {kana:"がくせい", romaji:"gakusei", meaning:"학생", day:2},
+
+  {kana:"またあした", romaji:"mata ashita", meaning:"내일 또 봐요 (인사말)", day:3},
+
+  {kana:"コート", romaji:"kooto", meaning:"코트", day:4},
+  {kana:"あかい", romaji:"akai", meaning:"빨간, 빨간색의", day:4},
+  {kana:"かばん", romaji:"kaban", meaning:"가방", day:4},
+
+  {kana:"てぶくろ", romaji:"tebukuro", meaning:"장갑", day:6},
+
+  {kana:"いいえ", romaji:"iie", meaning:"아니요", day:7},
+  {kana:"バスてい", romaji:"basutei", meaning:"버스 정류장", day:7},
+  {kana:"だいがく", romaji:"daigaku", meaning:"대학교", day:7},
+  {kana:"えき", romaji:"eki", meaning:"역", day:7},
+
+  {kana:"サラダ", romaji:"sarada", meaning:"샐러드", day:8},
+  {kana:"ホテル", romaji:"hoteru", meaning:"호텔", day:8},
+
+  {kana:"にほんじん", romaji:"nihonjin", meaning:"일본인", day:10},
+  {kana:"ちいさい", romaji:"chiisai", meaning:"작은", day:10},
+  {kana:"アメリカじん", romaji:"amerikajin", meaning:"미국인", day:10},
+  {kana:"おおきい", romaji:"ookii", meaning:"큰", day:10},
+  {kana:"ブラジルじん", romaji:"burajirujin", meaning:"브라질인", day:10},
+];
+
+const PHRASES = [
+  {set:"핵심구문 A", jp:"やさしいひとです！", kr:"친절한 사람입니다!"},
+  {set:"핵심구문 A", jp:"かっこいいせんせいです。", kr:"멋있는 선생님입니다."},
+  {set:"핵심구문 A", jp:"いしゃです。", kr:"의사입니다."},
+  {set:"핵심구문 A", jp:"かっこいいひとです！", kr:"멋있는 사람이에요!"},
+  {set:"핵심구문 A", jp:"やさしいがくせいです。", kr:"친절한 학생입니다."},
+
+  {set:"핵심구문 B", jp:"こんにちは、はなです。", kr:"안녕하세요, 하나입니다."},
+  {set:"핵심구문 B", jp:"こんばんは、けんです。", kr:"안녕하십니까, 켄입니다."},
+  {set:"핵심구문 B", jp:"なおみさん、こんにちは。", kr:"나오미 씨, 안녕하세요."},
+  {set:"핵심구문 B", jp:"またあした。", kr:"내일 또 봐요."},
+  {set:"핵심구문 B", jp:"はなさん、こんばんは。", kr:"하나 씨, 안녕하세요."},
+
+  {set:"핵심구문 C", jp:"これはすしですか。", kr:"이것은 스시입니까?"},
+  {set:"핵심구문 C", jp:"はい、これはおいしいです。", kr:"네, 이것은 맛있습니다."},
+  {set:"핵심구문 C", jp:"ピザ、ください。", kr:"피자 주세요."},
+  {set:"핵심구문 C", jp:"サラダはおいしいですか。", kr:"샐러드는 맛있습니까?"},
+  {set:"핵심구문 C", jp:"これはラーメンです。", kr:"이것은 라면입니다."},
+];
+
+/* =========================================================
+   진행 상황 저장 (window.storage) — 단어별 마스터 상태
+   ========================================================= */
+const progress = {}; // kana -> {correct, wrong, streak, mastered}
+let currentMode = "cards";
+let currentDayFilter = "all";
+let quizState = { pool: [], idx: 0, correctCount:0, total:0, answered:false };
+
+async function loadProgress(){
+  for(const w of WORDS){
+    try{
+      const r = await window.storage.get('progress:'+w.kana);
+      progress[w.kana] = r ? JSON.parse(r.value) : {correct:0,wrong:0,streak:0,mastered:false};
+    }catch(e){
+      progress[w.kana] = {correct:0,wrong:0,streak:0,mastered:false};
+    }
+  }
+}
+async function saveProgress(kana){
+  try{ await window.storage.set('progress:'+kana, JSON.stringify(progress[kana])); }catch(e){}
+}
+function markKnow(kana){
+  const p = progress[kana];
+  p.correct++; p.streak++; if(p.streak>=2) p.mastered = true;
+  saveProgress(kana); render();
+}
+function markDontKnow(kana){
+  const p = progress[kana];
+  p.wrong++; p.streak=0; p.mastered=false;
+  saveProgress(kana); render();
+}
+
+/* =========================================================
+   렌더링
+   ========================================================= */
+function renderStats(){
+  const total = WORDS.length;
+  const mastered = WORDS.filter(w=>progress[w.kana] && progress[w.kana].mastered).length;
+  const review = WORDS.filter(w=>progress[w.kana] && progress[w.kana].wrong>0 && !progress[w.kana].mastered).length;
+  const days = new Set(WORDS.map(w=>w.day)).size;
+  document.getElementById('statsBar').innerHTML = `
+    <div class="stat-chip"><div class="n">${total}</div><div class="l">전체 단어</div></div>
+    <div class="stat-chip"><div class="n">${mastered}</div><div class="l">외운 단어</div></div>
+    <div class="stat-chip"><div class="n">${review}</div><div class="l">복습 필요</div></div>
+    <div class="stat-chip"><div class="n">${days}</div><div class="l">학습 일수</div></div>
+  `;
+}
+
+function dayPillsHtml(){
+  const days = [...new Set(WORDS.map(w=>w.day))].sort((a,b)=>a-b);
+  let html = `<div class="day-pill ${currentDayFilter==='all'?'active':''}" data-day="all">전체</div>`;
+  days.forEach(d=>{
+    html += `<div class="day-pill ${currentDayFilter==d?'active':''}" data-day="${d}">Day ${d}</div>`;
+  });
+  return `<div class="day-select">${html}</div>`;
+}
+
+function renderCards(){
+  const filtered = currentDayFilter==='all' ? WORDS : WORDS.filter(w=>w.day==currentDayFilter);
+  let html = dayPillsHtml() + '<div class="grid">';
+  filtered.forEach(w=>{
+    const p = progress[w.kana] || {mastered:false, wrong:0};
+    let cls = '';
+    if(p.mastered) cls='mastered'; else if(p.wrong>0) cls='review';
+    html += `
+      <div class="flip-card" data-kana="${w.kana}">
+        <div class="flip-inner">
+          <div class="face front ${cls}">
+            <div class="kana jp">${w.kana}</div>
+            ${p.mastered?'<div class="badge">⭐</div>':''}
+          </div>
+          <div class="face back">
+            <div class="romaji">${w.romaji}</div>
+            <div class="meaning">${w.meaning}</div>
+            <div class="mark-row">
+              <button class="mark-btn dontknow" onclick="event.stopPropagation();markDontKnow('${w.kana}')">모르겠어요</button>
+              <button class="mark-btn know" onclick="event.stopPropagation();markKnow('${w.kana}')">외웠어요</button>
+            </div>
+          </div>
+        </div>
+      </div>`;
+  });
+  html += '</div>';
+  document.getElementById('main').innerHTML = html;
+  document.querySelectorAll('.flip-card').forEach(card=>{
+    card.addEventListener('click', ()=> card.classList.toggle('flipped'));
+  });
+  document.querySelectorAll('.day-pill').forEach(el=>{
+    el.addEventListener('click', ()=>{ currentDayFilter = el.dataset.day; renderCards(); });
+  });
+}
+
+function renderReview(){
+  const filtered = WORDS.filter(w=>{
+    const p = progress[w.kana];
+    return p && p.wrong>0 && !p.mastered;
+  });
+  if(filtered.length===0){
+    document.getElementById('main').innerHTML = `<div class="empty-state"><div class="em">🌱</div>복습할 단어가 없어요.<br>카드학습이나 자가테스트에서 '모르겠어요'를 누른 단어가 여기 모여요.</div>`;
+    return;
+  }
+  let html = '<div class="grid">';
+  filtered.forEach(w=>{
+    html += `
+      <div class="flip-card" data-kana="${w.kana}">
+        <div class="flip-inner">
+          <div class="face front review">
+            <div class="kana jp">${w.kana}</div>
+          </div>
+          <div class="face back">
+            <div class="romaji">${w.romaji}</div>
+            <div class="meaning">${w.meaning}</div>
+            <div class="mark-row">
+              <button class="mark-btn dontknow" onclick="event.stopPropagation();markDontKnow('${w.kana}')">모르겠어요</button>
+              <button class="mark-btn know" onclick="event.stopPropagation();markKnow('${w.kana}')">외웠어요</button>
+            </div>
+          </div>
+        </div>
+      </div>`;
+  });
+  html += '</div>';
+  document.getElementById('main').innerHTML = html;
+  document.querySelectorAll('.flip-card').forEach(card=>{
+    card.addEventListener('click', ()=> card.classList.toggle('flipped'));
+  });
+}
+
+function renderPhrase(){
+  const sets = [...new Set(PHRASES.map(p=>p.set))];
+  let html = '';
+  sets.forEach(s=>{
+    html += `<div class="phrase-set-title">${s}</div>`;
+    PHRASES.filter(p=>p.set===s).forEach((p,i)=>{
+      html += `<div class="phrase-card" data-idx="${PHRASES.indexOf(p)}">
+        <div class="phrase-jp jp">${p.jp}</div>
+        <div class="phrase-kr">${p.kr}</div>
+      </div>`;
+    });
+  });
+  document.getElementById('main').innerHTML = html;
+  document.querySelectorAll('.phrase-card').forEach(el=>{
+    el.addEventListener('click', ()=> el.classList.toggle('shown'));
+  });
+}
+
+/* ---------- QUIZ ---------- */
+function startQuiz(){
+  quizState.pool = [...WORDS].sort(()=>Math.random()-0.5);
+  quizState.idx = 0;
+  quizState.correctCount = 0;
+  quizState.total = 0;
+  renderQuizQuestion();
+}
+function renderQuizQuestion(){
+  if(quizState.idx >= quizState.pool.length){
+    document.getElementById('main').innerHTML = `
+      <div class="quiz-wrap">
+        <div class="em" style="font-size:40px;margin-bottom:14px;">🎉</div>
+        <div style="font-size:20px;font-weight:900;color:var(--deep-dark);margin-bottom:8px;">테스트 완료!</div>
+        <div class="quiz-score">${quizState.total}문제 중 ${quizState.correctCount}개 정답</div>
+        <button class="quiz-next" style="display:inline-block;margin-top:20px;" onclick="startQuiz()">다시 풀기</button>
+      </div>`;
+    return;
+  }
+  const w = quizState.pool[quizState.idx];
+  const wrongPool = WORDS.filter(x=>x.kana!==w.kana).sort(()=>Math.random()-0.5).slice(0,3);
+  const options = [w, ...wrongPool].sort(()=>Math.random()-0.5);
+  quizState.answered = false;
+
+  let optHtml = '';
+  options.forEach(o=>{
+    optHtml += `<button class="opt-btn" data-correct="${o.kana===w.kana}" data-kana="${o.kana}">${o.meaning}</button>`;
+  });
+
+  document.getElementById('main').innerHTML = `
+    <div class="quiz-wrap">
+      <div class="quiz-progress">${quizState.idx+1} / ${quizState.pool.length}</div>
+      <div class="quiz-word jp">${w.kana}</div>
+      <div class="quiz-romaji">${w.romaji}</div>
+      <div class="quiz-options">${optHtml}</div>
+      <div class="quiz-score">맞은 개수: ${quizState.correctCount} / ${quizState.total}</div>
+      <button class="quiz-next" id="quizNext">다음 문제 →</button>
+    </div>`;
+
+  document.querySelectorAll('.opt-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      if(quizState.answered) return;
+      quizState.answered = true;
+      quizState.total++;
+      const isCorrect = btn.dataset.correct === 'true';
+      if(isCorrect){
+        quizState.correctCount++;
+        btn.classList.add('correct');
+        markKnowSilent(w.kana);
+      }else{
+        btn.classList.add('wrong');
+        document.querySelectorAll('.opt-btn').forEach(b=>{ if(b.dataset.correct==='true') b.classList.add('correct'); });
+        markDontKnowSilent(w.kana);
+      }
+      document.querySelectorAll('.opt-btn').forEach(b=>b.disabled=true);
+      document.getElementById('quizNext').style.display='inline-block';
+    });
+  });
+  document.getElementById('quizNext').addEventListener('click', ()=>{
+    quizState.idx++;
+    renderQuizQuestion();
+  });
+}
+function markKnowSilent(kana){
+  const p = progress[kana]; p.correct++; p.streak++; if(p.streak>=2) p.mastered=true; saveProgress(kana); renderStats();
+}
+function markDontKnowSilent(kana){
+  const p = progress[kana]; p.wrong++; p.streak=0; p.mastered=false; saveProgress(kana); renderStats();
+}
+
+/* ---------- 모드 전환 ---------- */
+function render(){
+  renderStats();
+  if(currentMode==='cards') renderCards();
+  else if(currentMode==='phrase') renderPhrase();
+  else if(currentMode==='review') renderReview();
+  else if(currentMode==='quiz') startQuiz();
+}
+document.querySelectorAll('.tab').forEach(tab=>{
+  tab.addEventListener('click', ()=>{
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    tab.classList.add('active');
+    currentMode = tab.dataset.mode;
+    render();
+  });
+});
+
+(async function init(){
+  await loadProgress();
+  render();
+})();
+</script>
+</body>
+</html>
